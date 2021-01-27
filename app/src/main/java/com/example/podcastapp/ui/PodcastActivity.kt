@@ -12,17 +12,15 @@ import com.example.podcastapp.R
 import com.example.podcastapp.Service.ItunesService
 import com.example.podcastapp.repository.ItunesRepo
 
+
 class PodcastActivity : AppCompatActivity() {
+
     val TAG = javaClass.simpleName
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_podcast)
-
-
-//        val itunesService = ItunesService.instance
-//        val itunesRepo = ItunesRepo(itunesService)
-//        itunesRepo.searchByTerm("Android Developer") { Log.i(TAG,   "RESULTS : $it")}
-
+        setupToolbar()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -31,9 +29,7 @@ class PodcastActivity : AppCompatActivity() {
 
         val searchMenuItem = menu.findItem(R.id.search_item)
         val searchView = searchMenuItem?.actionView as SearchView
-
         val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-
         searchView.setSearchableInfo(searchManager.getSearchableInfo(componentName))
 
         return true
@@ -51,6 +47,10 @@ class PodcastActivity : AppCompatActivity() {
             performSearch(query.toString())
         }
     }
+    private fun setupToolbar() {
+        setSupportActionBar(findViewById(R.id.toolbar))
+    }
+
 
     private fun performSearch(term: String){
         val itunesService = ItunesService.instance
