@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">PodcastApp</string>
+    <string name="search_hint">Enter Podcast Search</string>
+    <string name="search">Search</string>
 </resources>
