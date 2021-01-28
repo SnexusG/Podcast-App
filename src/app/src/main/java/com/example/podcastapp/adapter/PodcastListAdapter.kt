@@ -12,8 +12,11 @@ import com.example.podcastapp.R
 import com.example.podcastapp.viewmodel.SearchViewModel
 
 class PodcastListAdapter(
-        private var podcastSummaryViewList:List<SearchViewModel.PodcastSummaryViewData>?, private val podcastListAdapterListener:PodcastListAdapterListener,
-        private val parentActivity: Activity) : RecyclerView.Adapter<PodcastListAdapter.ViewHolder>() {
+        private var podcastSummaryViewList:List<SearchViewModel.PodcastSummaryViewData>?,
+        private val podcastListAdapterListener:PodcastListAdapterListener,
+        private val parentActivity: Activity)
+    : RecyclerView.Adapter<PodcastListAdapter.ViewHolder>()
+{
     interface  PodcastListAdapterListener{
         fun onShowDetails(podcastSummaryViewData: SearchViewModel.PodcastSummaryViewData)
     }
