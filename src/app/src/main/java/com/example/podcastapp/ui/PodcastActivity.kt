@@ -19,6 +19,7 @@ import com.example.podcastapp.Service.ItunesService
 import com.example.podcastapp.adapter.PodcastListAdapter
 import com.example.podcastapp.repository.ItunesRepo
 import com.example.podcastapp.viewmodel.SearchViewModel
+import kotlinx.android.synthetic.main.activity_podcast.*
 
 
 class PodcastActivity : AppCompatActivity(), PodcastListAdapter.PodcastListAdapterListener {
@@ -26,16 +27,10 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapter.PodcastListAdapt
     val TAG = javaClass.simpleName
     private lateinit var searchViewModel: SearchViewModel
     private lateinit var podcastListAdapter: PodcastListAdapter
-    private lateinit var podcastRecyclerView: RecyclerView
-    private lateinit var progressBar: ProgressBar
-    private lateinit var toolbar:Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_podcast)
-        progressBar = findViewById(R.id.progress_bar)
-        toolbar = findViewById(R.id.toolbar)
-        podcastRecyclerView = findViewById(R.id.PodcastRecyclerView)
         setupToolbar()
         setupViewModels()
         updateControls()
@@ -66,7 +61,7 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapter.PodcastListAdapt
         }
     }
     private fun setupToolbar() {
-        setSupportActionBar(findViewById(R.id.toolbar))
+        setSupportActionBar(toolbar)
     }
 
 
@@ -89,24 +84,24 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapter.PodcastListAdapt
     }
 
     private fun updateControls(){
-        podcastRecyclerView.setHasFixedSize(true)
+        PodcastRecyclerView.setHasFixedSize(true)
 
         val layoutManager = LinearLayoutManager(this)
-        podcastRecyclerView.layoutManager = layoutManager
+        PodcastRecyclerView.layoutManager = layoutManager
 
-        val dividerItemDecoration = DividerItemDecoration(podcastRecyclerView.context, layoutManager.orientation)
-        podcastRecyclerView.addItemDecoration(dividerItemDecoration)
+        val dividerItemDecoration = DividerItemDecoration(PodcastRecyclerView.context, layoutManager.orientation)
+        PodcastRecyclerView.addItemDecoration(dividerItemDecoration)
 
         podcastListAdapter = PodcastListAdapter(null, this ,this)
-        podcastRecyclerView.adapter = podcastListAdapter
+        PodcastRecyclerView.adapter = podcastListAdapter
     }
 
     private fun showProgressBar(){
-        progressBar.visibility = View.VISIBLE
+        progress_bar.visibility = View.VISIBLE
     }
 
     private fun hideProgressBar(){
-        progressBar.visibility = View.INVISIBLE
+        progress_bar.visibility = View.INVISIBLE
     }
 
     override fun onShowDetails(podcastSummaryViewData: SearchViewModel.PodcastSummaryViewData) {
