@@ -3,4 +3,6 @@
     <string name="search_hint">Enter Podcast Search</string>
     <string name="search">Search</string>
     <string name="search_results">Search Results</string>
+    <string name="subscribe">Subscribe</string>
+    <string name="ok_button">OK</string>
 </resources>
