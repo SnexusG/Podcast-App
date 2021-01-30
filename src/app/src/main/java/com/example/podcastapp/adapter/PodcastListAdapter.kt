@@ -9,6 +9,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.podcastapp.R
+import com.example.podcastapp.util.DateUtils
 import com.example.podcastapp.viewmodel.SearchViewModel
 
 class PodcastListAdapter(
@@ -58,7 +59,7 @@ class PodcastListAdapter(
         val searchView = searchViewList[position]
         holder.podcastSummaryViewData = searchView
         holder.nameTextView.text = searchView.name
-        holder.lastUpdatedTextView.text = searchView.lastUpdated
+        holder.lastUpdatedTextView.text = "last updated : "+ DateUtils.JsonDateToShortDate(searchView.lastUpdated)
         Glide.with(parentActivity)
                 .load(searchView.imageUrl)
                 .into(holder.podcastImageView)
