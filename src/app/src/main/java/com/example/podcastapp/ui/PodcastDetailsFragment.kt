@@ -1,12 +1,16 @@
 package com.example.podcastapp.ui
 
 import android.os.Bundle
+import android.text.method.ScrollingMovementMethod
 import android.view.*
 import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.example.podcastapp.R
+import com.example.podcastapp.adapter.EpisodeListAdapter
 import com.example.podcastapp.viewmodel.PodcastViewModel
 import kotlinx.android.synthetic.main.fragment_podcast_details.*
 
@@ -14,6 +18,7 @@ class PodcastDetailsFragment : Fragment() {
 
     private lateinit var podcastViewModel: PodcastViewModel
     private lateinit var feedImageView : ImageView
+    private lateinit var episodeListAdapter: EpisodeListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +30,7 @@ class PodcastDetailsFragment : Fragment() {
         feedImageView = view.findViewById(R.id.feedImageView)
         setupViewModel()
         updateControls()
+        setupControls()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -57,6 +63,24 @@ class PodcastDetailsFragment : Fragment() {
         fun newInstance(): PodcastDetailsFragment{
             return PodcastDetailsFragment()
         }
+    }
+
+    private fun setupControls(){
+        feedDescTextView.movementMethod = ScrollingMovementMethod()
+
+        episodeRecyclerView.setHasFixedSize(true)
+
+        val layoutManager = LinearLayoutManager(activity)
+        episodeRecyclerView.layoutManager = layoutManager
+
+        val dividerItemDecoration = DividerItemDecoration(episodeRecyclerView.context, layoutManager.orientation)
+
+        episodeRecyclerView.addItemDecoration(dividerItemDecoration)
+
+        episodeListAdapter = EpisodeListAdapter(podcastViewModel.activePodcastViewData?.episodes)
+
+        episodeRecyclerView.adapter = episodeListAdapter
+
     }
 
 }

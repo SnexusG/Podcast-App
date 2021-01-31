@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.podcastapp.R
+import com.example.podcastapp.Service.FeedService
 import com.example.podcastapp.Service.ItunesService
 import com.example.podcastapp.adapter.PodcastListAdapter
 import com.example.podcastapp.repository.ItunesRepo
@@ -96,7 +97,8 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapter.PodcastListAdapt
 
         podcastViewModel = ViewModelProviders.of(this)
                 .get(PodcastViewModel::class.java)
-        podcastViewModel.podcastRepo = PodcastRepo()
+        val rssService = FeedService.instance
+        podcastViewModel.podcastRepo = PodcastRepo(rssService)
     }
 
     private fun updateControls(){
