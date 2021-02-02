@@ -18,7 +18,7 @@ import java.util.*
 data class Episode (
         @PrimaryKey
         var guid: String = "",
-        val podcastId: Long? = null,
+        var podcastId: Long? = null,
         var title: String = "",
         var description: String = "",
         var mediaUrl: String = "",

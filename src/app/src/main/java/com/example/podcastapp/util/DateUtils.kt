@@ -13,7 +13,7 @@ object DateUtils{
         val inFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
         val date = inFormat.parse(jsonDate)
         val outputFormat = DateFormat.getDateInstance(DateFormat.SHORT,
-                Locale.ENGLISH)
+                Locale.getDefault())
         return outputFormat.format(date)
     }
 

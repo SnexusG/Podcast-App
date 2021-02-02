@@ -1,5 +1,6 @@
 package com.example.podcastapp.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.text.method.ScrollingMovementMethod
 import android.view.*
@@ -19,6 +20,8 @@ class PodcastDetailsFragment : Fragment() {
     private lateinit var podcastViewModel: PodcastViewModel
     private lateinit var feedImageView : ImageView
     private lateinit var episodeListAdapter: EpisodeListAdapter
+    private var listener : onPodcastDetailsListener ? = null
+    private var menuItem : MenuItem? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,6 +43,8 @@ class PodcastDetailsFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater?.inflate(R.menu.menu_details, menu)
+        menuItem = menu?.findItem(R.id.menu_feed_action)
+        updateMenuItem()
     }
 
     private fun setupViewModel(){
@@ -81,6 +86,45 @@ class PodcastDetailsFragment : Fragment() {
 
         episodeRecyclerView.adapter = episodeListAdapter
 
+    }
+
+    interface onPodcastDetailsListener {
+        fun onSubscribe()
+        fun onUnsubscribe()
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if(context is onPodcastDetailsListener){
+            listener = context
+        }else{
+            throw RuntimeException(context!!.toString() + " must implement onPodcastDetailsListener")
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId ){
+            R.id.menu_feed_action -> {
+                podcastViewModel.activePodcastViewData?.feedUrl?.let{
+                    if(podcastViewModel.activePodcastViewData?.subscribed!!){
+                        listener?.onUnsubscribe()
+                    }else{
+                        listener?.onSubscribe()
+                    }
+                }
+                return true
+            }else -> return super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun updateMenuItem(){
+        val viewData = podcastViewModel.activePodcastViewData ?: return
+        menuItem?.title =
+                if(viewData.subscribed ){
+                            getString(R.string.unsubscribe)
+                        }else{
+                        getString(R.string.subscribe)
+                }
     }
 
 }

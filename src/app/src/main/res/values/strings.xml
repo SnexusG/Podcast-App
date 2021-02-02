@@ -5,4 +5,6 @@
     <string name="search_results">Search Results</string>
     <string name="subscribe">Subscribe</string>
     <string name="ok_button">OK</string>
+    <string name="subscribed_podcasts">Subscribed Podcasts</string>
+    <string name="unsubscribe">Unsubscribe</string>
 </resources>

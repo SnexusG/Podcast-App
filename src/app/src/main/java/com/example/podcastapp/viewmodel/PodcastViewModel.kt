@@ -2,15 +2,20 @@ package com.example.podcastapp.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Transformations
 import com.example.podcastapp.model.Episode
 import com.example.podcastapp.model.Podcast
 import com.example.podcastapp.repository.PodcastRepo
+import com.example.podcastapp.util.DateUtils
 import java.util.*
 
 class PodcastViewModel(application: Application) : AndroidViewModel(application) {
 
     var podcastRepo: PodcastRepo? = null
     var activePodcastViewData: PodcastViewData? = null
+    private var activePodcast: Podcast? = null
+    var livePodcastData : LiveData<List<SearchViewModel.PodcastSummaryViewData>>? = null
 
     data class PodcastViewData(
             var subscribed: Boolean = false,
@@ -40,7 +45,7 @@ class PodcastViewModel(application: Application) : AndroidViewModel(application)
     private fun podcastToPodcastView(podcast: Podcast):
             PodcastViewData {
         return PodcastViewData(
-                false,
+                podcast.id != null,
                 podcast.feedTitle,
                 podcast.feedUrl,
                 podcast.feedDesc,
@@ -57,8 +62,39 @@ class PodcastViewModel(application: Application) : AndroidViewModel(application)
                 it.feedTitle = podcastSummaryViewData.name ?: ""
                 it.imageUrl = podcastSummaryViewData.imageUrl ?: ""
                 activePodcastViewData = podcastToPodcastView(it)
+                activePodcast = it
                 callback(activePodcastViewData)
             }
         }
     }
+
+    fun saveActivePodcat(){
+        val repo = podcastRepo ?: return
+        activePodcast?.let{
+            repo.save(it)
+        }
+    }
+
+    private fun podcastToSummaryView(podcast: Podcast): SearchViewModel.PodcastSummaryViewData{
+            return SearchViewModel.PodcastSummaryViewData(podcast.feedTitle, DateUtils.dateToShortDate(podcast.lastUpdated), podcast.imageUrl, podcast.feedUrl)
+    }
+
+    fun getPodcasts() : LiveData<List<SearchViewModel.PodcastSummaryViewData>>? {
+        val repo = podcastRepo ?: return null
+        if(livePodcastData == null){
+            val liveData = repo.getAll()
+            livePodcastData = Transformations.map(liveData){
+                podcastList -> podcastList.map { podcast -> podcastToSummaryView(podcast)}
+            }
+        }
+        return livePodcastData
+    }
+
+    fun deleteActivePodcast(){
+        val repo = podcastRepo ?: return
+        activePodcast?.let{
+            repo.delete(it)
+        }
+    }
+
 }

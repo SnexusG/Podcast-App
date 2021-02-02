@@ -59,7 +59,8 @@ class PodcastListAdapter(
         val searchView = searchViewList[position]
         holder.podcastSummaryViewData = searchView
         holder.nameTextView.text = searchView.name
-        holder.lastUpdatedTextView.text = "last updated : "+ DateUtils.JsonDateToShortDate(searchView.lastUpdated)
+        //holder.lastUpdatedTextView.text = "last updated : " + DateUtils.JsonDateToShortDate(searchView.lastUpdated)
+        holder.lastUpdatedTextView.text = searchView.lastUpdated.toString()
         Glide.with(parentActivity)
                 .load(searchView.imageUrl)
                 .into(holder.podcastImageView)
