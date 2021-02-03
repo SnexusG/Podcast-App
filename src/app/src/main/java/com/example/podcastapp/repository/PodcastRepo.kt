@@ -13,6 +13,9 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 
 class PodcastRepo(private val feedService: FeedService, private var podcastDao: PodcastDao) {
+
+    class PodcastUpdateInfo(val feedUrl:String, val name:String, val newCount:Int)
+
     fun getPodcast(feedUrl: String, callback: (Podcast?) -> Unit) {
         GlobalScope.launch {
             val podcast = podcastDao.loadPodcast(feedUrl)
@@ -103,6 +106,24 @@ class PodcastRepo(private val feedService: FeedService, private var podcastDao: 
             for (episode in episodes) {
                 episode.podcastId = podcastId
                 podcastDao.insertEpisode(episode)
+            }
+        }
+    }
+
+    fun updatePodcastEpisodes(callback : (List<PodcastUpdateInfo>) -> Unit){
+        val updatedPodcasts : MutableList<PodcastUpdateInfo> = mutableListOf()
+        val podcasts = podcastDao.loadPodcastsStatic()
+        var processCount = podcasts.count()
+        for(podcast in podcasts){
+            getNewEpisodes(podcast){newEpisodes ->
+                if(newEpisodes.count() > 0){
+                    saveNewEpisodes(podcast.id!!, newEpisodes)
+                    updatedPodcasts.add(PodcastUpdateInfo(podcast.feedUrl, podcast.feedTitle, newEpisodes.count()))
+                }
+                processCount--
+                if(processCount == 0){
+                    callback(updatedPodcasts)
+                }
             }
         }
     }
