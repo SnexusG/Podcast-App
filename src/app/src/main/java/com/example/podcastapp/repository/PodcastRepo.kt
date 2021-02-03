@@ -59,8 +59,8 @@ class PodcastRepo(private val feedService: FeedService, private var podcastDao: 
 
         val description = if (rssResponse.description == "")
             rssResponse.summary else rssResponse.description
-        return Podcast(null, feedUrl, rssResponse.title, description, imageUrl,
-                rssResponse.lastUpdated, episodes = rssItemsToEpisodes(items))
+
+        return Podcast(null, feedUrl, rssResponse.title, description, imageUrl, rssResponse.lastUpdated, episodes = rssItemsToEpisodes(items))
     }
 
         fun save(podcast:Podcast){
@@ -80,6 +80,30 @@ class PodcastRepo(private val feedService: FeedService, private var podcastDao: 
     fun delete(podcast : Podcast){
         GlobalScope.launch {
             podcastDao.deletePodcast(podcast)
+        }
+    }
+
+    private fun getNewEpisodes(localPodcast: Podcast, callback : (List<Episode>) -> Unit){
+        feedService.getFeed(localPodcast.feedUrl) { response ->
+            if(response != null){
+                val remotePodcast = rssResponseToPodcast(localPodcast.feedUrl, localPodcast.imageUrl, response)
+                remotePodcast?.let{
+                    val localEpisodes = podcastDao.loadEpisdoes(localPodcast.id!!)
+                    val newEpisodes = remotePodcast.episodes.filter{ episode ->  localEpisodes.find{episode.guid == it.guid} == null}
+                    callback(newEpisodes)
+                }
+            }else{
+                callback(listOf())
+            }
+        }
+    }
+
+    private fun saveNewEpisodes(podcastId: Long, episodes: List<Episode>) {
+        GlobalScope.launch {
+            for (episode in episodes) {
+                episode.podcastId = podcastId
+                podcastDao.insertEpisode(episode)
+            }
         }
     }
 
