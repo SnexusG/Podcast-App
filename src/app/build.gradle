@@ -68,4 +68,5 @@ dependencies {
     implementation "android.arch.persistence.room:runtime:$room_version"
     annotationProcessor "android.arch.lifecycle:compiler:$architecture_version"
     kapt "android.arch.persistence.room:compiler:$room_version"
+    implementation "com.firebase:firebase-jobdispatcher:0.8.5"
 }
