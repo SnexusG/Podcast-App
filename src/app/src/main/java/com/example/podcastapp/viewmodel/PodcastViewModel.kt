@@ -96,5 +96,17 @@ class PodcastViewModel(application: Application) : AndroidViewModel(application)
             repo.delete(it)
         }
     }
+    fun setActivePodcast(feedUrl: String, callback: (SearchViewModel.PodcastSummaryViewData?) -> Unit) {
+        val repo = podcastRepo ?: return
+        repo.getPodcast(feedUrl) { podcast ->
+            if (podcast == null) {
+                callback(null)
+            } else {
+                activePodcastViewData = podcastToPodcastView(podcast)
+                activePodcast = podcast
+                callback(podcastToSummaryView(podcast))
+            }
+        }
+    }
 
 }
