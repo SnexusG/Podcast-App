@@ -69,4 +69,5 @@ dependencies {
     annotationProcessor "android.arch.lifecycle:compiler:$architecture_version"
     kapt "android.arch.persistence.room:compiler:$room_version"
     implementation "com.firebase:firebase-jobdispatcher:0.8.5"
+    implementation "com.android.support:support-media-compat:$support_lib_version"
 }
