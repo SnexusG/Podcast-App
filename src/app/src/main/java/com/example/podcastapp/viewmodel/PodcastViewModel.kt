@@ -16,6 +16,7 @@ class PodcastViewModel(application: Application) : AndroidViewModel(application)
     var activePodcastViewData: PodcastViewData? = null
     private var activePodcast: Podcast? = null
     var livePodcastData : LiveData<List<SearchViewModel.PodcastSummaryViewData>>? = null
+    var activeEpisodeViewData: EpisodeViewData? = null
 
     data class PodcastViewData(
             var subscribed: Boolean = false,

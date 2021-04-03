@@ -39,7 +39,7 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapter.PodcastListAdapt
     private lateinit var podcastListAdapter: PodcastListAdapter
     private lateinit var searchMenuItem: MenuItem
     private lateinit var podcastViewModel: PodcastViewModel
-    private val TAG_EPISODE_UPDATE_JOB = "com.podcastapp.episodes"
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -165,6 +165,8 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapter.PodcastListAdapt
 
     companion object{
         private val TAG_DETAILS_FRAGMENT = "DetailsFragment"
+        private const val TAG_PLAYER_FRAGMENT = "PlayerFragment"
+        private val TAG_EPISODE_UPDATE_JOB = "com.podcastapp.episodes"
     }
 
     private fun createPodcastDetailsFragment(): PodcastDetailsFragment {
@@ -244,5 +246,31 @@ class PodcastActivity : AppCompatActivity(), PodcastListAdapter.PodcastListAdapt
                 )
                 .build()
         dispatcher.mustSchedule(episodeUpdateJob)
+    }
+
+    override fun onShowEpisodePlayer(episodeViewData: PodcastViewModel.EpisodeViewData) {
+        podcastViewModel.activeEpisodeViewData = episodeViewData
+        showPlayerFragment()
+    }
+
+    private fun createEpisodePlayerFragment(): EpisodePlayerFragment {
+        var episodePlayerFragment =
+            supportFragmentManager.findFragmentByTag(TAG_PLAYER_FRAGMENT) as
+                    EpisodePlayerFragment?
+        if (episodePlayerFragment == null) {
+            episodePlayerFragment = EpisodePlayerFragment.newInstance()
+        }
+        return episodePlayerFragment
+    }
+
+    private fun showPlayerFragment(){
+        val episodePlayerFragment = createEpisodePlayerFragment()
+        supportFragmentManager.beginTransaction().replace(
+            R.id.podcastDetailsContainer,
+            episodePlayerFragment,
+            TAG_PLAYER_FRAGMENT
+        ).addToBackStack("PlayerFragment").commit()
+        PodcastRecyclerView.visibility = View.INVISIBLE
+        searchMenuItem.isVisible = false
     }
 }
