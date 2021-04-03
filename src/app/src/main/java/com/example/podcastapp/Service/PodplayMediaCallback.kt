@@ -8,6 +8,7 @@ import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.ResultReceiver
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -19,6 +20,11 @@ class PodplayMediaCallback(val context: Context, val mediaSession: MediaSessionC
     private var mediaExtras: Bundle? = null
     private var focusRequest: AudioFocusRequest? = null
     var listener: PodplayMediaListener? = null
+
+    companion object{
+        const val CMD_CHANGESPEED = "change_speed"
+        const val CMD_EXTRA_SPEED = "speed"
+    }
 
     private fun ensureAudioFocus():Boolean{
         val audioManager = this.context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -95,6 +101,8 @@ class PodplayMediaCallback(val context: Context, val mediaSession: MediaSessionC
                     mediaPlayer.prepare()
                     mediaExtras?.let { mediaExtras ->
                         mediaSession.setMetadata(MediaMetadataCompat.Builder()
+                                .putLong(MediaMetadataCompat.METADATA_KEY_DURATION,
+                                        mediaPlayer.duration.toLong())
                             .putString(MediaMetadataCompat.METADATA_KEY_TITLE,
                                 mediaExtras.getString(MediaMetadataCompat.METADATA_KEY_TITLE))
                             .putString(MediaMetadataCompat.METADATA_KEY_ARTIST,
@@ -132,22 +140,76 @@ class PodplayMediaCallback(val context: Context, val mediaSession: MediaSessionC
         listener?.onPausePlaying()
     }
 
-    private fun setState(state:Int){
+    private fun setState(state:Int, newSpeed:Float? = null){
         var position:Long = -1
         mediaPlayer?.let{
             position = it.currentPosition.toLong()
+        }
+        var speed = 1.0f
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (newSpeed == null) {
+                speed = mediaPlayer?.getPlaybackParams()?.speed ?: 1.0f
+            } else {
+                speed = newSpeed
+            }
+
+            mediaPlayer?.let { mediaPlayer ->
+                try {
+                    mediaPlayer.playbackParams = mediaPlayer.playbackParams.setSpeed(speed)
+                } catch (e: Exception) {
+                    mediaPlayer.reset()
+                    mediaUri?.let { mediaUri ->
+                        mediaPlayer.setDataSource(context, mediaUri)
+                    }
+                    mediaPlayer.prepare()
+                    mediaPlayer.playbackParams =
+                            mediaPlayer.playbackParams.setSpeed(speed)
+                    mediaPlayer.seekTo(position.toInt())
+
+                    if (state == PlaybackStateCompat.STATE_PLAYING) {
+                        mediaPlayer.start()
+                    }
+                }
+            }
         }
         val playbackState = PlaybackStateCompat.Builder()
             .setActions(PlaybackStateCompat.ACTION_PLAY or PlaybackStateCompat.ACTION_STOP or
                     PlaybackStateCompat.ACTION_PLAY_PAUSE or
                     PlaybackStateCompat.ACTION_PAUSE)
-            .setState(state, position, 1.0f)
+            .setState(state, position, speed)
             .build()
 
         mediaSession.setPlaybackState(playbackState)
         if (state == PlaybackStateCompat.STATE_PAUSED ||
             state == PlaybackStateCompat.STATE_PLAYING) {
             listener?.onStateChanged()
+        }
+    }
+
+    override fun onSeekTo(pos:Long){
+        super.onSeekTo(pos)
+        mediaPlayer?.seekTo(pos.toInt())
+        val playbackState: PlaybackStateCompat? =
+                mediaSession.controller.playbackState
+        if (playbackState != null) {
+            setState(playbackState.state)
+        } else {
+            setState(PlaybackStateCompat.STATE_PAUSED)
+        }
+    }
+
+    private fun changeSpeed(extras:Bundle){
+        var playbackState = PlaybackStateCompat.STATE_PAUSED
+        if (mediaSession.controller.playbackState != null) {
+            playbackState = mediaSession.controller.playbackState.state
+        }
+        setState(playbackState, extras.getFloat(CMD_EXTRA_SPEED))
+    }
+
+    override fun onCommand(command: String?, extras: Bundle?, cb: ResultReceiver?) {
+        super.onCommand(command, extras, cb)
+        when (command) {
+            CMD_CHANGESPEED -> extras?.let { changeSpeed(it) }
         }
     }
 
