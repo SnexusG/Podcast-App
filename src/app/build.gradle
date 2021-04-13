@@ -71,4 +71,5 @@ dependencies {
     implementation "com.firebase:firebase-jobdispatcher:0.8.5"
     implementation "com.android.support:support-media-compat:$support_lib_version"
     implementation "com.android.support:support-media-compat:26.1.0"
+    implementation "com.google.truth:truth:1.0.1"
 }
