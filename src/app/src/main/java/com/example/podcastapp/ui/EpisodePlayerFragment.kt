@@ -26,6 +26,7 @@ import com.example.podcastapp.Service.PodplayMediaCallback.Companion.CMD_CHANGES
 import com.example.podcastapp.Service.PodplayMediaCallback.Companion.CMD_EXTRA_SPEED
 import com.example.podcastapp.Service.PodplayMediaService
 import com.example.podcastapp.util.HtmlUtils
+import com.example.podcastapp.util.SpeedUtil
 import com.example.podcastapp.viewmodel.PodcastViewModel
 import kotlinx.android.synthetic.main.fragment_episode_player.*
 
@@ -77,7 +78,7 @@ class EpisodePlayerFragment : Fragment() {
 
     private fun changeSpeed() {
         playerSpeed += 0.25f
-        if (playerSpeed > 2.0f) {
+        if(!SpeedUtil.checkSpeed(playerSpeed)){
             playerSpeed = 0.75f
         }
         val bundle = Bundle()
