@@ -73,6 +73,5 @@ dependencies {
     implementation "com.android.support:support-media-compat:26.1.0"
     testImplementation "com.google.truth:truth:1.0.1"
     androidTestImplementation "com.google.truth:truth:1.0.1"
-
-
+    androidTestImplementation "androidx.arch.core:core-testing:2.1.0"
 }
